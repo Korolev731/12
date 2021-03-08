@@ -1,10 +1,14 @@
-const app = require('express')();
-const http = require('http').createServer(app);
+import socket
 
-app.get('/', (req, res) => {
-  res.send('<h1>Hello world</h1>');
-});
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-http.listen(3000, () => {
-  console.log('listening on *:9065');
-});
+
+server.bind(('', 6526))
+server.listen()
+while True:
+      client_socket, addr = server.accept()
+      request = client_socket.recv(1024)
+      print ('Connected ' + addr[0] + ':' + str(addr[1]))
+      client_socket.sendall(b'Its Works!')
+      client_socket.close()

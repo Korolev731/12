@@ -1,8 +1,14 @@
-FROM centos/python-34-centos7
+FROM centos:latest
 
-COPY listener.py /var/listener.py
+MAINTAINER IKorolev
 
-CMD ["python", "/var/listener.py"]
+RUN yum install epel-release -y \
+    && yum update -y \
+    && yum install python3-pip -y \
+    && mkdir /www
 
-EXPOSE 9065
+COPY q.py /www/q.py
 
+CMD ["python3", "/www/q.py"]
+
+EXPOSE 6526
