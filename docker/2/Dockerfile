@@ -1,0 +1,8 @@
+FROM centos/python-34-centos7
+
+COPY listener.py /var/listener.py
+
+CMD ["python", "/var/listener.py"]
+
+EXPOSE 9065
+
