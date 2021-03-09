@@ -12,4 +12,4 @@ COPY q.py /myapp/q.py
 
 CMD ["python3", "/myapp/q.py"]
 
-EXPOSE 8080
+EXPOSE 6589
