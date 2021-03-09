@@ -22,7 +22,7 @@
  && rm -rf /var/lib/apt/lists/*  чистит кэш
 
 -----------
-Dockerfile
+# Dockerfile
 ```
 FROM — задаёт базовый (родительский) образ.
 LABEL — описывает метаданные. Например — сведения о том, кто создал и поддерживает образ.
@@ -55,14 +55,13 @@ docker run -d -p 80:80  -v /tmp/www:/usr/local/apache2/htdocs:ro httpd:latest
 curl http://localhost/
 ```
 ========
-````
+```
 docker build -t demo:1 -f Dockerfile .
 docker inspect demo:1
 docker run -d -p 6589:6589 demo:1
 docker ps
 curl http://localhost
 docker build -t korolev731/test:v0 -f Dockerfile .
-
 ```
 
 -----------
@@ -83,7 +82,7 @@ docker volume create --driver local --opt type=none --opt device=/home/spishchyk
 docker volume list
 ```
 --------
-#terraform 
+# terraform 
 ```
 terraform --version
 terraform 0.13upgrade .
@@ -91,7 +90,5 @@ terraform init
 terraform plan
 terraform apply
 terraform destroy
-
 terraform destroy -auto-approve
-
 ```
