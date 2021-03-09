@@ -7,8 +7,8 @@ RUN yum install epel-release -y \
     && yum install python3-pip -y \
     && mkdir /www
 
-COPY script.py /www/script.py
+COPY q.py /www/q.py
 
-CMD ["python3", "/www/script.py"]
+CMD ["python3", "/www/q.py"]
 
-EXPOSE 8080
+EXPOSE 6598
