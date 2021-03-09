@@ -2,15 +2,15 @@ version: '3.3'
 
 services:
   service_01:
-    sonarr:
-	 image: ghcr.io/linuxserver/sonarr
-      container_name: sonarr
-	 volumes:
-		- /path/to/data:/config
-		- /path/to/tvseries:/tv
-		- /path/to/downloadclient-downloads:/downloads
-      ports:
-		- 8989:8989
+   sonarr:
+    image: ghcr.io/linuxserver/sonarr
+    container_name: sonarr
+   volumes:
+     - /path/to/data:/config
+     - /path/to/tvseries:/tv
+     - /path/to/downloadclient-downloads:/downloads
+    ports:
+     - 8989:8989
   service_02:
     radarr:
      image: ghcr.io/linuxserver/radarr
