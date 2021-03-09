@@ -1,3 +1,8 @@
+
+
+https://habr.com/ru/post/310460/
+
+
 * docker-compose build Сборка проекта
 * docker-compose up Запуск проекта
 * docker-compose down останавливать и удалять контейнеры
