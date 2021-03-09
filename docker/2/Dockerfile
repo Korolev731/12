@@ -1,4 +1,4 @@
-FROM centos:latest
+FROM alpine:latest
 
 MAINTAINER IKorolev
 
