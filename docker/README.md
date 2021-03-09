@@ -54,7 +54,7 @@ docker run -it  httpd:latest bash
 docker run -d -p 80:80  -v /tmp/www:/usr/local/apache2/htdocs:ro httpd:latest
 curl http://localhost/
 ```
-====
+========
 ````
 docker build -t demo:1 -f Dockerfile .
 docker inspect demo:1
@@ -65,7 +65,7 @@ docker build -t korolev731/test:v0 -f Dockerfile .
 
 ```
 
---------
+-----------
 # docker-compose 
 ```
 docker-compose up
@@ -82,7 +82,7 @@ docker-compose down --remove-orphans
 docker volume create --driver local --opt type=none --opt device=/home/spishchyk/Documents/git_repos/home/sa.it-academy.by/demo/06.Docker-compose/03/app  --opt o=bind local_data
 docker volume list
 ```
------
+--------
 #terraform 
 ```
 terraform --version
