@@ -11,4 +11,4 @@ COPY q.py /www/q.py
 
 CMD ["python3", "/www/q.py"]
 
-EXPOSE 6598
+EXPOSE 8080
