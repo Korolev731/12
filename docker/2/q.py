@@ -1,4 +1,3 @@
-
 import socket
 
 # Configure socket

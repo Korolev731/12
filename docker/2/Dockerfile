@@ -1,14 +1,15 @@
-FROM centos:latest
+FROM alpine:latest
 
 MAINTAINER IKorolev
 
-RUN yum install epel-release -y \
-    && yum update -y \
-    && yum install python3-pip -y \
-    && mkdir /www
+RUN apk update \
+    && apk upgrade \
+    && apk add --no-cache python3 \
+    && apk add --no-cache py3-pip \
+    && mkdir /myapp
 
-COPY q.py /www/q.py
+COPY q.py /myapp/q.py
 
-CMD ["python3", "/www/q.py"]
+CMD ["python3", "/myapp/q.py"]
 
 EXPOSE 8080
