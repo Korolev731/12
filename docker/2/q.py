@@ -10,5 +10,5 @@ while True:
       client_socket, addr = server.accept()
       request = client_socket.recv(1024)
       print ('Connected ' + addr[0] + ':' + str(addr[1]))
-      client_socket.sendall(b'Its Works!')
+      client_socket.sendall(b'Privet Siarhei')
       client_socket.close()
