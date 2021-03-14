@@ -1,4 +1,10 @@
 ## 08.Kubernetes
+```
+sudo wget -qO- https://github.com/derailed/k9s/releases/download/v0.22.0/k9s_Linux_x86_64.tar.gz | tar zxvf -  -C /tmp/
+sudo mv /tmp/k9s /usr/local/bin
+```
+[k9s instal] (https://habr.com/ru/company/flant/blog/524196/)
+-----
 
 ```
   689  nano w.yaml
