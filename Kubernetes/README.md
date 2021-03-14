@@ -1,6 +1,8 @@
 grep -E --color 'vmx|svm' /proc/cpuinfo
 
-
+ps aux | grep proxy
+10243* ps aux | grep "kubectl proxy"
+10244* kill 617669
 
 curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
 
