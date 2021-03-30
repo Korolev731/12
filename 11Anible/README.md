@@ -22,3 +22,7 @@ host_key_checking = False
 callback_whitelist = profile_tasks, timer
 log_path = /tmp/ansible.log
 ```
+```
+ansible_ssh_common_args='-o ProxyCommand="ssh -W %h:%p -q jump_sa@178.124.202.53"'
+
+```
