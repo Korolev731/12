@@ -8,11 +8,11 @@
     docker_image: "bitnami/wordpress:latest"
 
   tasks:
-    - name: Pull docker image
-      shell: |
-        docker pull "{{ docker_image }}"
-      args:
-        executable: /bin/bash
+#    - name: Pull docker image
+#      shell: |
+#        docker pull "{{ docker_image }}"
+#      args:
+#        executable: /bin/bash
 
     - name: Stop docker container
       shell: |
