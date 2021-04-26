@@ -1,0 +1,30 @@
+---
+  - name: test "{{ name_cms }}"
+    shell: |
+        docker ps -a
+        exit 0
+    args:
+      executable: /bin/bash
+    register: out
+  - debug:
+      msg: "{{ out.stdout }}"
+
+  - name: remove "{{ name_cms }}" 
+    shell: |
+        docker stop "{{ name_cms }}"
+        docker rm -f "{{ name_cms }}"
+        docker rmi -f "{{ name_cms }}"
+        exit 0
+    args:
+      executable: /bin/bash
+    when: "'{{ name_cms }}' in out.stdout"
+
+  - name: stop "{{ name_db }}"
+    shell: |
+        docker stop "{{ name_db }}"
+        docker rm -f "{{ name_db }}"
+        docker rmi -f "{{ name_db }}"
+        exit 0
+    args:
+      executable: /bin/bash
+    when: "'{{ name_db }}' in out.stdout"

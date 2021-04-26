@@ -1,0 +1,77 @@
+---
+  - hosts: all
+    become: true
+    vars:
+      name_cms: "wordpress"
+      name_db: "mariadb"
+      docker_image: "bitnami/wordpress:latest"
+
+    tasks:
+      - name: pull
+        shell: |
+            docker pull "{{ docker_image }}"
+        args:
+          executable: /bin/bash
+
+      - name: stop
+        shell: |
+            docker stop "{{ name_cms }}"
+        args:
+          executable: /bin/bash
+
+      - name: backup
+        shell: |
+            rsync -a /var/lib/docker/volumes/ /data/backups/wolumes.bkp.$(date +%Y%m%d-%H.%M.%S)
+        args:
+          executable: /bin/bash
+
+      - name: rm
+        shell: |
+            docker rm "{{ name_cms }}"
+        args:
+      - name: run
+        shell: |
+          docker run -d --name wordpress \
+          -p 8080:8080 -p 8443:8443 \
+          -e ALLOW_EMPTY_PASSWORD=yes \
+          -e WORDPRESS_DATABASE_USER=bn_wordpress \
+          -e WORDPRESS_DATABASE_NAME=bitnami_wordpress \
+          --network wordpress-network \
+          --volume wordpress_data:/bitnami/wordpress \
+          bitnami/wordpress:latest
+        args:
+          executable: /bin/bash
+
+      - name: Checks if App is works correctly
+        block:
+          - name: Checks if it works
+            uri:
+              url: "http://192.168.253.95:8080"
+              return_content: yes
+            register: out
+            failed_when: "'My name is Yas' not in out.content"
+            become: no
+          - name: content
+            debug:
+              msg: "out.status"
+          - name: Send notofication to Slack
+            slack:
+              token: TFBPBNB2L/B0123VAJ678/gS90HwQ2KIlo8wT3xWx
+              msg: "Wordpress works"
+              channel: "#github_notifi"
+              username: "webhook"
+              parse: "full"
+
+
+
+        rescue:
+          - name: Send notofication to Slack
+            slack:
+              token: TFBPBNB2L/B0123VAJ678/gS90HwQ2KIlo8wT3x
+              msg: "Wordpress does not work"
+              channel: "#github_notifi"
+              username: "webhook"
+              parse: "full"
+#            - name: Import rollback playbook tasks
+#              include_tasks: rollback.yaml
+#              tags: never 
