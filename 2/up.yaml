@@ -52,21 +52,13 @@
             url: "http://{{ ansible_ssh_host }}:8080"
             return_content: yes
           register: out
-          failed_when: "'My name is Dmitry' not in out.content"
+          failed_when: "'My name is Ivan' not in out.content"
           become: no
         
         - name: Show content
           debug:
             msg: "out.status"
-        
-        - name: Notify Slack if all good
-          include_role:
-            name: slack_handler
-            tasks_from: good
-      rescue:
-        - include_role:
-            name: slack_handler
-            tasks_from: failure
+       
             
         # - name: Import playbook tasks
         #   include_role:
