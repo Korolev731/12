@@ -14,11 +14,11 @@
 #      args:
 #        executable: /bin/bash
 
-    - name: Stop docker container
-      shell: |
-        docker stop "{{ name_cms }}"
-      args:
-        executable: /bin/bash
+#    - name: Stop docker container
+#      shell: |
+#        docker stop "{{ name_cms }}"
+#      args:
+#        executable: /bin/bash
 
     - name: Backup data
       shell: |
