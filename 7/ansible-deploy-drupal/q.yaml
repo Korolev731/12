@@ -1,14 +1,10 @@
 ---
 - hosts: all
-
       vars:
         deploydrupal_repo: "git@github.com:ChromaticHQ/site.git"
-
         deploydrupal_checkout_user: "jenkins"
         deploydrupal_apache_user: "www-data"
-
         deploydrupal_dir: "/var/www/html"
         deploydrupal_code: true
-
       roles:
         - chromatichq.deploy-drupal
