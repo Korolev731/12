@@ -14,15 +14,6 @@
     warn: false
   become: yes
 
-- name: Add Composer to global path
-  copy: 
-    dest: /usr/local/bin/composer
-    group: root
-    mode: '0755'
-    owner: root
-    src: /usr/src/composer.phar
-    remote_src: yes
-  become: yes
 
 - name: install git
   package: name=git state=latest
