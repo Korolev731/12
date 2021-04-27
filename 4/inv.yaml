@@ -1,5 +1,5 @@
 ---
 wordpress:
   hosts:
-    wordpress_1:
+    wordpress_2:
       ansible_host: 192.168.201.5
