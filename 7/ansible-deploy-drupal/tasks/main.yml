@@ -1,0 +1,184 @@
+---
+- name: create files directory if it doesn't exist.
+  file:
+    path: "{{ deploydrupal_core_path }}/sites/{{ deploydrupal_site_name }}/files"
+    state: directory
+    owner: "{{ deploydrupal_apache_user }}"
+    group: "{{ deploydrupal_checkout_user }}"
+    mode: 0770
+  become: "{{ deploydrupal_files_become }}"
+
+- name: open permissions on site directory.
+  file:
+    path: "{{ deploydrupal_core_path }}/sites/{{ deploydrupal_site_name }}"
+    state: directory
+    owner: "{{ deploydrupal_checkout_user }}"
+    group: "{{ deploydrupal_checkout_user }}"
+    mode: ug+w
+
+- name: discover settings files in all /sites directories.
+  find:
+    paths: "{{ deploydrupal_core_path }}/sites"
+    patterns: "{{ deploydrupal_settings_file_pattern }}"
+    depth: 2
+    recurse: true
+  register: deploydrupal_settings_files
+
+- name: open permissions on settings files.
+  file:
+    path: "{{ settings_file.path }}"
+    state: file
+    owner: "{{ deploydrupal_checkout_user }}"
+    group: "{{ deploydrupal_checkout_user }}"
+    mode: ug+w
+  loop: "{{ deploydrupal_settings_files.files }}"
+  loop_control:
+    loop_var: settings_file
+
+- name: get latest code.
+  git:
+    repo: "{{ deploydrupal_repo }}"
+    dest: "{{ deploydrupal_dir }}"
+    version: "{{ deploydrupal_version }}"
+    update: true
+    force: "{{ deploydrupal_git_force }}"
+    accept_hostkey: true
+  when: "deploydrupal_code"
+  notify: clear opcache
+
+- name: check if a composer.json file is present.
+  stat: "path={{ deploydrupal_dir }}/composer.json"
+  register: deploydrupal_composer_file
+
+# –no-ansi, –no-interaction and –no-progress are always appended.
+- name: run composer install if composer.json is present.
+  composer:
+    command: install
+    working_dir: "{{ deploydrupal_dir }}"
+    no_dev: "{{ deploydrupal_composer_no_dev_dependencies }}"
+    optimize_autoloader: "{{ deploydrupal_composer_optimize_autoloader }}"
+  register: composer_output
+  when:
+    - deploydrupal_composer_file.stat.exists == true
+    - deploydrupal_composer_install == true
+
+- name: print composer output
+  debug: var=composer_output.stdout_lines
+
+- name: close permissions on default directory.
+  file:
+    path: "{{ deploydrupal_core_path }}/sites/{{ deploydrupal_site_name }}"
+    state: directory
+    owner: "{{ deploydrupal_checkout_user }}"
+    group: "{{ deploydrupal_checkout_user }}"
+    mode: ug-w
+
+- name: rediscover settings files in all /sites directories in case of settings file changes.
+  find:
+    paths: "{{ deploydrupal_core_path }}/sites"
+    patterns: "{{ deploydrupal_settings_file_pattern }}"
+    depth: 2
+    recurse: true
+  register: deploydrupal_settings_files
+
+- name: close permissions on settings files.
+  file:
+    path: "{{ settings_file.path }}"
+    state: file
+    owner: "{{ deploydrupal_checkout_user }}"
+    group: "{{ deploydrupal_checkout_user }}"
+    mode: ug-w
+  loop: "{{ deploydrupal_settings_files.files }}"
+  loop_control:
+    loop_var: settings_file
+
+- name: update files directory owner and permissions.
+  file:
+    path: "{{ deploydrupal_core_path }}/sites/{{ deploydrupal_site_name }}/files"
+    state: directory
+    owner: "{{ deploydrupal_apache_user }}"
+    group: "{{ deploydrupal_checkout_user }}"
+    mode: 0770
+  become: "{{ deploydrupal_files_become }}"
+
+- name: run theme build tasks.
+  shell: "{{ item }}"
+  args:
+    chdir: "{{ deploydrupal_npm_theme_path }}"
+  with_items: "{{ deploydrupal_npm_theme_run_commands }}"
+  when:
+    - deploydrupal_npm_theme_build
+    - deploydrupal_npm_theme_path is defined
+
+# Drush ^9 uses the Drupal service container. We intentionally clear the Drupal
+# cache before the Drush cache to avoid fatal errors due to stale cache in the
+# service container.
+- name: clear caches.
+  shell: "{{ deploydrupal_drush_path }} cache-rebuild"
+  args:
+    chdir: "{{ deploydrupal_core_path }}/sites/{{ deploydrupal_site_name }}"
+  when:
+    - deploydrupal_drush_cache_rebuild
+
+- name: clear drush cache.
+  shell: "{{ deploydrupal_drush_path }} cache-clear drush"
+  args:
+    chdir: "{{ deploydrupal_core_path }}/sites/{{ deploydrupal_site_name }}"
+  when:
+    - deploydrupal_drush_cache_rebuild
+
+# site-install.
+- name: install site.
+  shell: "{{ deploydrupal_drush_path }} site-install {{ deploydrupal_site_install_config | ternary('--existing-config', '') }} --verbose --yes"
+  args:
+    chdir: "{{ deploydrupal_core_path }}/sites/{{ deploydrupal_site_name }}"
+  when:
+    - deploydrupal_site_install
+
+- name: adjust files directory sub-folder permissions after site install.
+  file:
+    path: "{{ deploydrupal_core_path }}/sites/{{ deploydrupal_site_name }}/files/{{ item }}"
+    state: directory
+    owner: "{{ deploydrupal_apache_user }}"
+    group: "{{ deploydrupal_checkout_user }}"
+    mode: 0770
+  become: "{{ deploydrupal_files_become }}"
+  with_items: "{{ deploydrupal_file_permission_fix_directories }}"
+  when:
+    - deploydrupal_site_install
+
+- name: drush deploy
+  shell: "{{ deploydrupal_drush_path }} deploy -v -y"
+  args:
+    chdir: "{{ deploydrupal_core_path }}/sites/{{ deploydrupal_site_name }}"
+  when:
+    - deploydrupal_drush_deploy
+
+# Import the latest configuration again. This includes the latest
+# configuration_split configuration. Importing this twice ensures that the
+# latter command enables and disables modules based upon the most up to date
+# configuration. Additional information and discussion can be found here:
+# https://github.com/drush-ops/drush/issues/2449#issuecomment-708655673
+- name: drush config import
+  shell: "{{ deploydrupal_drush_path }} config:import -y"
+  args:
+    chdir: "{{ deploydrupal_core_path }}/sites/{{ deploydrupal_site_name }}"
+  when:
+    - deploydrupal_drush_deploy
+
+# Identify Drupal configuration changes in core or contrib updates that need
+# to be exported and may have been missed.
+- name: config structure check
+  shell: "{{ deploydrupal_drush_path }} config:export -y"
+  args:
+    chdir: "{{ deploydrupal_core_path }}/sites/{{ deploydrupal_site_name }}"
+  register: deploydrupal_config_check_result
+  when:
+    - deploydrupal_config_check_structure
+  failed_when: "deploydrupal_config_check_structure_string not in deploydrupal_config_check_result.stderr"
+
+# Save redis data to disk. This is necessary in Docker environments to ensure we
+# preserve the correct cache state.
+- name: save redis data to disk.
+  command: "redis-cli -h {{ deploydrupal_redis_host }} -n 0 SAVE"
+  when: "deploydrupal_redis_flush"
