@@ -1,19 +1,8 @@
 ---
-
-- name: Validate Composer checksum
-  get_url:
-    dest: /usr/src/
-    url: https://getcomposer.org/installer
-  become: yes
-
-- name: Download and install Composer
-  shell: curl -sS https://getcomposer.org/installer | php
+- name: install the latest Composer
+  shell: curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer warn=False
   args:
-    chdir: /usr/src/
     creates: /usr/local/bin/composer
-    warn: false
-  become: yes
-
 
 - name: install git
   package: name=git state=latest
