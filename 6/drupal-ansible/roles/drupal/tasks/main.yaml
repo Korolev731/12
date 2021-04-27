@@ -1,7 +1,6 @@
 ---
 - name: install the latest Composer
-  shell: curl -sS https://getcomposer.org/installer -o composer-setup.php
-  php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+  shell: curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer warn=False
   args:
     creates: /usr/local/bin/composer
 
