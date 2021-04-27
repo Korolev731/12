@@ -1,0 +1,14 @@
+# Drupal Variables
+
+drupal_version: 8.5.3
+drupal_site_path: "/var/www/drupal"
+drupal_site_name: "My Drupal Site"
+drupal_admin_username: admin
+drupal_admin_pass: StrongPass
+
+# Let's Encrypt Settings
+
+# Set it to false if domain is not configured.
+letsencrypt_generate: true 
+letsencrypt_domain: mydrupal.example.com
+letsencrypt_email: me@example.com
