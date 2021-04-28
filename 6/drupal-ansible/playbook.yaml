@@ -3,9 +3,9 @@
   gather_facts: true
   tasks:
   - name: update and upgrade system packages
-    apt:
-      upgrade: yes
-      update_cache: yes
+#    apt:
+#      upgrade: yes
+#      update_cache: yes
 
 - hosts: db-server
   roles:
