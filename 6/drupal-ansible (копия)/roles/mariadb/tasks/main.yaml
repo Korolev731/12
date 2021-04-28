@@ -13,12 +13,12 @@
 - name: install the latest pip
   shell: curl https://bootstrap.pypa.io/get-pip.py | python3 warn=False
 
-- name: install python MySQL client
-  pip:
-    name:
-      - setuptools
-      - mysqlclient
-    state: latest
+#- name: install python MySQL client
+#  pip:
+#    name:
+#      - setuptools
+#      - mysqlclient
+#    state: latest
 
 - name: configure mariadb to bind to all addresses
   lineinfile:

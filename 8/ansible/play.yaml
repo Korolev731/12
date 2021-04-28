@@ -1,0 +1,44 @@
+---
+- hosts: node1
+  become: true
+  roles:
+    - docker
+
+  tasks:
+
+    - name: Create directory docker
+      file:
+        path: /data/docker
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Create directory for database
+      file:
+        path: /data/docker/db
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Create directory for webApp
+      file:
+        path: /data/docker/cmsfiles
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Copy docker-compose file to docker directory
+      copy:
+        src: /var/lib/jenkins/workspace/first_deploy/docker-compose.yaml
+        dest: /data/docker
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Run docker-compose
+      shell: docker-compose up -d
+      args:
+        chdir: /data/docker

@@ -1,0 +1,42 @@
+---
+- name: Stop and remove container
+  shell: docker-compose -f docker-compose_update.yaml down
+  args:
+    chdir: /data/docker
+
+- name: remove image
+  shell: docker rmi wordpress:php7.4-apache
+
+- name: Syncing files from backup
+  shell: rsync -avH --delete /data/docker/backup/cms_files /data/docker/cmsfiles/
+
+- name: Run previous docker-compose file
+  shell: docker-compose -f docker-compose.yaml up -d
+  args:
+    chdir: /data/docker
+
+- name: Pause for runing app
+  pause:
+    seconds: 40
+
+- name: Curl and check output
+  block:
+    - name: Curl content
+      uri:
+        url: "http://192.168.100.11:8080"
+        return_content: yes
+      register: content
+      failed_when: "'WordPress' not in content.content"
+    - name: Print content
+      debug:
+        msg: "{{ content }}"
+  rescue:
+    - name: Send notification message via Slack
+      slack:
+        token: T01AU9RFDBP/B01FP8WGJQ2/3NfVRiyNla1OsdVpRKa51jlZ
+        channel: '#project'
+        username: 'Ansible sender'
+        msg: 'Rollback task: failed'
+        icon_url: https://agardner.net/wp-content/uploads/2018/08/ansible-logo.png
+        parse: 'full'
+ 

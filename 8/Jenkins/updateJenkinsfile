@@ -1,0 +1,24 @@
+properties([disableConcurrentBuilds()])
+pipeline{
+    agent any
+
+    options {
+      buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
+      timestamps()
+    }
+
+    stages{
+        stage('Clone git repo'){
+            steps{
+              git credentialsId: 'GitLast', 
+                url: 'https://github.com/alekseytivonchik/Project'
+            }
+        }
+
+        stage('Run ansible update'){
+            steps{
+                ansiblePlaybook credentialsId: 'node1_root_key', disableHostKeyChecking: true, installation: 'ansible', inventory: 'ansible/hosts.yaml', playbook: 'ansible/aplication_update.yaml'
+            }
+        }
+    }
+}
