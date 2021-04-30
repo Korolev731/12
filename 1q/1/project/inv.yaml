@@ -3,4 +3,4 @@ processwire:
   hosts:
     test:
       ansible_host: 192.168.201.5
-      ansible_ssh_user: vagrant
+      ansible_ssh_user: root
