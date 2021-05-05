@@ -1,39 +1,37 @@
 ---
-- name: Install packages for Docker
-  yum:
-    name:
-      - yum-utils
-      - device-mapper-persistent-data
-      - lvm2
-    state: present
+  - name: "install docker"
+    apt:
+      name:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg-agent
+        - software-properties-common
+      state: present
+      update_cache: yes
+  - name: install apt-key for docker
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
 
-- name: Add Docker repo
-  get_url:
-    url: https://download.docker.com/linux/centos/docker-ce.repo
-    dest: /etc/yum.repos.d/docer-ce.repo
-  become: yes
+  - name: install docker apt-repository
+    apt_repository:
+      repo: deb [arch=amd64] https://download.docker.com/linux/debian buster stable
+      state: present
 
-- name: Install Docker
-  yum:
-    name:
-      - docker-ce
-      - docker-ce-cli
-      - containerd.io
-      - docker-compose
-    state: present
-  become: yes
+  - name:
+    apt:
+      update_cache: yes
+      name:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-compose
 
-- name: Enable docker
-  shell: |
-    usermod -aG docker $USER
-    chown $USER /var/run/docker.sock
-    systemctl enable docker
-  args:
-    executable: /bin/bash
-
-- name: Start Docker service
-  service:
-    name: docker
-    state: started
-    enabled: yes
-  become: yes
+  - name: enable docker
+    shell: |
+      usermod -aG docker $USER
+      chown $USER /var/run/docker.sock
+      systemctl enable docker
+    args:
+      executable: /bin/bash
